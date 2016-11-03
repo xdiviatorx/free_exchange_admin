@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#004d40</color>
+    <color name="colorAccent">#f44336</color>
+
+    <color name="roundedIVBorderColor">@color/colorWhite</color>
+
+    <color name="loginButtonColor">#32141414</color>
+
+    <color name="colorLightGray">#e8eced</color>
+    <color name="colorMediumGray">#b5b5b5</color>
+    <color name="colorDarkGray">#757575</color>
+
+    <color name="colorGreen">@color/colorPrimary</color>
+    <color name="colorDarkGreen">@color/colorPrimaryDark</color>
+
+    <color name="colorBlue">#2196f3</color>
+
+    <color name="colorWhite">#fff</color>
+    <color name="colorWhite140">#8cffffff</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorBlack140">#8c000000</color>
+    <color name="colorTransparent">#00ffffff</color>
+    <!-- #32000000 -->
+
+    <color name="halfTransparentGreenCardView">#64188f68</color>
+</resources>
