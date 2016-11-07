@@ -6,57 +6,63 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
+        android:layout_width="2000dp"
         android:layout_height="wrap_content"
-        app:cardUseCompatPadding="true"
-        app:cardElevation="4dp">
+        app:cardCornerRadius="0dp"
+        app:cardElevation="2dp"
+        android:layout_gravity="center">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/llContent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/tvOffer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"/>
+                android:text="Simple post test\nsimple description"
+                android:layout_margin="10dp"
+                style="@style/PostMessageText"/>
 
-            <com.technologies.mobile.free_exchange_admin.views.AttachmentsLayout
-                android:id="@+id/alPhotos"
+            <com.technologies.mobile.free_exchange_admin.views.AutomaticPhotoLayout
+                android:id="@+id/aplPhotos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"/>
+                android:shrinkColumns="*"
+                android:stretchColumns="*"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:background="@color/colorMediumGray"
-                />
+                android:background="@color/colorLightMediumGray" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_margin="5dp">
+                android:layout_margin="3dp"
+                android:gravity="end">
 
-                <Button
+                <ImageButton
                     android:id="@+id/bReject"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/cancel"
+                    android:theme="@style/CustomTransparentImageButtonTheme"
                     android:text="@string/reject"
-                    android:textColor="@color/colorWhite"
-                    android:layout_weight="1"/>
+                    android:textColor="@color/colorWhite" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/bAccept"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/ok"
+                    android:theme="@style/CustomTransparentImageButtonTheme"
                     android:text="@string/accept"
-                    android:textColor="@color/colorWhite"
-                    android:theme="@style/AcceptButtonTheme"
-                    android:layout_weight="1"/>
+                    android:textColor="@color/colorWhite"/>
 
             </LinearLayout>
 

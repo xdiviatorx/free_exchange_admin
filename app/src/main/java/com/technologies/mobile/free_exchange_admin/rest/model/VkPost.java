@@ -53,13 +53,19 @@ public class VkPost {
 
     private static String LOG_TAG = "VkPost";
 
+    public static String SIZE_130 = "photo_130";
+    public static String SIZE_604 = "photo_604";
+    public static String SIZE_807 = "photo_807";
+    public static String SIZE_1280 = "photo_1280";
+
+
     JSONObject mPost;
 
-    public VkPost(JSONObject post){
+    public VkPost(JSONObject post) {
         mPost = post;
     }
 
-    public int getId(){
+    public int getId() {
         try {
             return mPost.getInt("id");
         } catch (JSONException e) {
@@ -68,7 +74,7 @@ public class VkPost {
         return 0;
     }
 
-    public String getText(){
+    public String getText() {
         try {
             return mPost.getString("text");
         } catch (JSONException e) {
@@ -77,14 +83,14 @@ public class VkPost {
         return "";
     }
 
-    public ArrayList<String> getPhoto130Array(){
+    public ArrayList<String> getPhotoArray(String size) {
         try {
             JSONArray attachments = mPost.getJSONArray("attachments");
-            Log.e(LOG_TAG,attachments.toString());
+            Log.e(LOG_TAG, attachments.toString());
             ArrayList<String> res = new ArrayList<>();
-            for( int i = 0; i < attachments.length(); i++ ){
-                if( attachments.getJSONObject(i).getString("type").equals("photo")) {
-                    res.add(attachments.getJSONObject(i).getJSONObject("photo").getString("photo_130"));
+            for (int i = 0; i < attachments.length(); i++) {
+                if (attachments.getJSONObject(i).getString("type").equals("photo")) {
+                    res.add(attachments.getJSONObject(i).getJSONObject("photo").getString(size));
                 }
             }
             return res;
@@ -94,7 +100,7 @@ public class VkPost {
         return new ArrayList<>();
     }
 
-    public VKAttachments getAttachments(){
+    public VKAttachments getAttachments() {
         VKAttachments attachments = new VKAttachments();
         try {
             VKApiPost vkApiPost = new VKApiPost(mPost);

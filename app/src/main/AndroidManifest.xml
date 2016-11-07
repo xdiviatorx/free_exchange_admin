@@ -24,7 +24,9 @@
             android:theme="@style/VK.Transparent" />
         <activity
             android:name=".activities.LoginActivity"
-            android:theme="@style/LoginTheme"/>
+            android:theme="@style/LoginTheme" />
+        <activity android:name=".activities.OfferActivity" />
+        <activity android:name=".activities.ImagePreviewActivity"></activity>
     </application>
 
 </manifest>

@@ -9,6 +9,7 @@
     <color name="loginButtonColor">#32141414</color>
 
     <color name="colorLightGray">#e8eced</color>
+    <color name="colorLightMediumGray">#d5d6d6</color>
     <color name="colorMediumGray">#b5b5b5</color>
     <color name="colorDarkGray">#757575</color>
 

@@ -19,25 +19,25 @@ public class VkPostOffer {
 
     private VkPost mVkPost;
 
-    public VkPostOffer(VkPost vkPost){
+    public VkPostOffer(VkPost vkPost) {
         mVkPost = vkPost;
     }
 
-    public void accept(long postId){
+    public void accept(long postId) {
         post(postId);
     }
 
-    public void reject(long postId){
+    public void reject(long postId) {
         delete(postId);
     }
 
-    private void post(long postId){
+    private void post(long postId) {
         VKParameters params = new VKParameters();
-        params.put(VKApiConst.OWNER_ID,VkGroupManager.VK_GROUP_ID);
-        params.put(VKApiConst.POST_ID,postId);
+        params.put(VKApiConst.OWNER_ID, VkGroupManager.VK_GROUP_ID);
+        params.put(VKApiConst.POST_ID, postId);
         params.put(VKApiConst.ACCESS_TOKEN, VKAccessToken.currentToken());
         params.put(VKApiConst.ATTACHMENTS, mVkPost.getAttachments());
-        params.put(VKApiConst.SIGNED,1);
+        params.put(VKApiConst.SIGNED, 1);
         VKRequest vkRequest = VKApi.wall().post(params);
         vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -52,10 +52,10 @@ public class VkPostOffer {
         });
     }
 
-    private void delete(long postId){
+    private void delete(long postId) {
         VKParameters params = new VKParameters();
-        params.put(VKApiConst.OWNER_ID,VkGroupManager.VK_GROUP_ID);
-        params.put(VKApiConst.POST_ID,postId);
+        params.put(VKApiConst.OWNER_ID, VkGroupManager.VK_GROUP_ID);
+        params.put(VKApiConst.POST_ID, postId);
         params.put(VKApiConst.ACCESS_TOKEN, VKAccessToken.currentToken());
         VKRequest vkRequest = VKApi.wall().delete(params);
         vkRequest.executeWithListener(new VKRequest.VKRequestListener() {

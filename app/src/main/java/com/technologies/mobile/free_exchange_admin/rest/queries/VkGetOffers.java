@@ -32,22 +32,30 @@ public class VkGetOffers {
 
     OnDownloadListener onDownloadListener;
 
-    String vkGroupId = "-132094733";
+    boolean downloading = false;
 
     public VkGetOffers() {
 
     }
 
     public void init() {
-        query(0, 10);
+        downloading = true;
+        query(0);
     }
 
-    private void query(int offset, int count) {
+    public void additionalDownloading(int offset){
+        if( !downloading ){
+            downloading = true;
+            query(offset);
+        }
+    }
+
+    private void query(int offset) {
         VKParameters params = new VKParameters();
-        params.put(VKApiConst.OWNER_ID, vkGroupId);
+        params.put(VKApiConst.OWNER_ID, VkGroupManager.VK_GROUP_ID);
         params.put(VKApiConst.OFFSET, offset);
-        params.put(VKApiConst.COUNT, count);
-        params.put("filter", "suggests");
+        params.put(VKApiConst.COUNT, Constants.DOWNLOADING_LENGTH);
+        params.put(Constants.FILTER, Constants.SUGGESTS);
         params.put(VKApiConst.ACCESS_TOKEN, VKAccessToken.currentToken());
         Log.e(LOG_TAG, "VK ACCESS TOKEN = " + VKAccessToken.currentToken());
         final VKRequest request = VKApi.wall().get(params);
@@ -55,10 +63,14 @@ public class VkGetOffers {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
+                downloading = false;
                 Log.e(LOG_TAG, "RESPONSE = " + response.responseString);
                 try {
                     JSONArray array = response.json.getJSONObject("response").getJSONArray("items");
                     VkPost[] vkPosts = new VkPost[array.length()];
+                    if( array.length() == 0 ){
+                        downloading = true;
+                    }
                     for (int i = 0; i < array.length(); i++) {
                         vkPosts[i] = new VkPost(array.getJSONObject(i));
                     }
@@ -76,6 +88,7 @@ public class VkGetOffers {
             public void onError(VKError error) {
                 super.onError(error);
                 Log.e(LOG_TAG, "ERROR = " + error.errorMessage);
+                downloading = false;
             }
         });
     }
