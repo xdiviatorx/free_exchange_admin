@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.technologies.mobile.free_exchange_admin.R;
+import com.technologies.mobile.free_exchange_admin.rest.queries.VkChatFinder;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKScope;
@@ -61,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.vkLogin: {
-                VKSdk.login(this, VKScope.WALL, VKScope.PHOTOS);
+                VKSdk.login(this, VKScope.WALL, VKScope.PHOTOS, VKScope.MESSAGES);
                 vkLogin.setVisibility(View.INVISIBLE);
                 break;
             }
@@ -75,6 +76,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onResult(VKAccessToken res) {
                 setResult(RESULT_OK);
                 //siteLogin(res.userId);
+
+                //CHAT ID FINDER THREAD
+                new Thread(new VkChatFinder(getApplicationContext())).start();
+
                 finish();
             }
 

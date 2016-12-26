@@ -6,6 +6,9 @@ package com.technologies.mobile.free_exchange_admin.rest.queries;
 
 public class VkGroupManager {
 
-    public static final String VK_GROUP_ID = "-132094733";
+    //public static final String VK_GROUP_ID = "-132094733"; //TEST GROUP
+    public static final String VK_GROUP_ID = "-47670295";
+
+    public static final String ADMIN_REJECT_CHAT_TITLE = "Фришоп. Отклоненные новости.";
 
 }

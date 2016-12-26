@@ -73,6 +73,8 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
      */
     public String body;
 
+    public int chat_id;
+
     /**
      * List of media-attachments;
      */
@@ -112,6 +114,8 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         fwd_messages = new VKList<VKApiMessage>(source.optJSONArray("fwd_messages"), VKApiMessage.class);
         emoji = ParseUtils.parseBoolean(source, "emoji");
         deleted = ParseUtils.parseBoolean(source, "deleted");
+
+        chat_id = source.getInt("chat_id");
         return this;
     }
 
@@ -130,6 +134,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         this.fwd_messages = in.readParcelable(VKList.class.getClassLoader());
         this.emoji = in.readByte() != 0;
         this.deleted = in.readByte() != 0;
+        this.chat_id = in.readInt();
     }
 
     /**
@@ -162,6 +167,7 @@ public class VKApiMessage extends VKApiModel implements Identifiable, android.os
         dest.writeParcelable(this.fwd_messages, flags);
         dest.writeByte(emoji ? (byte) 1 : (byte) 0);
         dest.writeByte(deleted ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.chat_id);
     }
 
     public static Creator<VKApiMessage> CREATOR = new Creator<VKApiMessage>() {

@@ -26,4 +26,6 @@
     <!-- #32000000 -->
 
     <color name="halfTransparentGreenCardView">#64188f68</color>
+
+    <color name="colorLightBlue">#00bbff</color>
 </resources>

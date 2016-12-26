@@ -11,7 +11,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity">
+        <activity
+            android:name=".activities.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,12 +23,34 @@
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/VK.Transparent" />
         <activity
             android:name=".activities.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/LoginTheme" />
-        <activity android:name=".activities.OfferActivity" />
-        <activity android:name=".activities.ImagePreviewActivity"></activity>
+        <activity
+            android:name=".activities.EditOfferVkActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.ImagePreviewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.VkRejectDialogActivity"
+            android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".activities.SiteRejectDialogActivity"
+            android:theme="@style/DialogTheme" />
+        <activity android:name=".activities.OfferDialogActivity" />
+        <activity
+            android:name=".activities.SiteApproveDialogActivity"
+            android:theme="@style/DialogTheme" />
+        <activity
+            android:name=".activities.EditOfferSiteActivity"
+            android:screenOrientation="portrait"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="3b9649c538c9824b2ae203533e587460d21fe688" />
     </application>
 
 </manifest>

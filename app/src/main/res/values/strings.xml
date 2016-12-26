@@ -9,6 +9,37 @@
 
     <string name="logout">Выйти</string>
 
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+
     <string name="accept">Принять</string>
+    <string name="prepare">На публикацию</string>
     <string name="reject">Отклонить</string>
+    <string name="check">Проверить</string>
+    <string name="save_and_check">Сохранить и проверить</string>
+    <string name="publish">Опубликовать</string>
+
+    <string name="deferred_post">Отложенная публикация для VK</string>
+
+    <string name="is_reject">Вы действительно хотите отклонить это объявление?</string>
+    <string name="is_approve">Вы действительно хотите опубликовать это объявление?</string>
+    <string name="reject_message">Комментарий к отклонению:</string>
+
+    <string name="choose_publish_place">Выберите место для публикации</string>
+
+    <!-- checkboxes -->
+
+    <string name="vk">Вконтакте</string>
+    <string name="site">Сайт</string>
+    <string name="telegramm">Телеграмм</string>
+    <string name="you_can_publish">Можно публиковать</string>
+
+    <!-- Offers count -->
+
+    <string name="offers_count">ОБЪЯВЛЕНИЙ</string>
+
+    <!-- to reject chat message -->
+
+    <string name="message_to_chat_error">Идентификатор чата отклоненных не определен.\nСообщение не отправлено.</string>
+    <string name="message_to_chat_success">Сообщение в чат отклоненных успешно отправлено.</string>
 </resources>

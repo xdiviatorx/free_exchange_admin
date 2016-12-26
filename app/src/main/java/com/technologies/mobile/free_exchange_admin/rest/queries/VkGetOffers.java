@@ -2,25 +2,17 @@ package com.technologies.mobile.free_exchange_admin.rest.queries;
 
 import android.util.Log;
 
-import com.technologies.mobile.free_exchange_admin.callbacks.OnDownloadListener;
-import com.technologies.mobile.free_exchange_admin.rest.model.VkPost;
+import com.technologies.mobile.free_exchange_admin.callbacks.OnVkDownloadListener;
 import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.VKScope;
-import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.methods.VKApiWall;
-import com.vk.sdk.api.model.VKApiMessage;
-import com.vk.sdk.api.model.VKApiPost;
 import com.vk.sdk.api.model.VKPostArray;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by diviator on 01.11.2016.
@@ -30,7 +22,7 @@ public class VkGetOffers {
 
     private static String LOG_TAG = "VkGetOffers";
 
-    OnDownloadListener onDownloadListener;
+    OnVkDownloadListener onVkDownloadListener;
 
     boolean downloading = false;
 
@@ -43,8 +35,8 @@ public class VkGetOffers {
         query(0);
     }
 
-    public void additionalDownloading(int offset){
-        if( !downloading ){
+    public void additionalDownloading(int offset) {
+        if (!downloading) {
             downloading = true;
             query(offset);
         }
@@ -56,32 +48,34 @@ public class VkGetOffers {
         params.put(VKApiConst.OFFSET, offset);
         params.put(VKApiConst.COUNT, Constants.DOWNLOADING_LENGTH);
         params.put(Constants.FILTER, Constants.SUGGESTS);
-        params.put(VKApiConst.ACCESS_TOKEN, VKAccessToken.currentToken());
-        Log.e(LOG_TAG, "VK ACCESS TOKEN = " + VKAccessToken.currentToken());
+        params.put(VKApiConst.ACCESS_TOKEN, VKAccessToken.currentToken().accessToken);
+        //Log.e(LOG_TAG, "VK ACCESS TOKEN = " + VKAccessToken.currentToken());
         final VKRequest request = VKApi.wall().get(params);
+        request.setModelClass(VKPostArray.class);
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
                 downloading = false;
-                Log.e(LOG_TAG, "RESPONSE = " + response.responseString);
-                try {
-                    JSONArray array = response.json.getJSONObject("response").getJSONArray("items");
-                    VkPost[] vkPosts = new VkPost[array.length()];
-                    if( array.length() == 0 ){
-                        downloading = true;
-                    }
-                    for (int i = 0; i < array.length(); i++) {
-                        vkPosts[i] = new VkPost(array.getJSONObject(i));
-                    }
 
-                    if (onDownloadListener != null) {
-                        onDownloadListener.onPostsDownloaded(vkPosts);
-                    }
+                Log.e(LOG_TAG,response.json.toString());
+
+                int count = 0;
+                try {
+                    count = response.json.getJSONObject("response").getInt("count");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
+                VKPostArray vkPostArray = ((VKPostArray) response.parsedModel);
+
+                if (vkPostArray.size() == 0) {
+                    downloading = true;
+                }
+
+                if (onVkDownloadListener != null) {
+                    onVkDownloadListener.onPostsDownloaded(vkPostArray,count);
+                }
             }
 
             @Override
@@ -93,7 +87,7 @@ public class VkGetOffers {
         });
     }
 
-    public void setOnDownloadListener(OnDownloadListener onDownloadListener) {
-        this.onDownloadListener = onDownloadListener;
+    public void setOnVkDownloadListener(OnVkDownloadListener onVkDownloadListener) {
+        this.onVkDownloadListener = onVkDownloadListener;
     }
 }

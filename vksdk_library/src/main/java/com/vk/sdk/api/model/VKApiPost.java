@@ -32,6 +32,12 @@ import android.os.Parcel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * A post object describes a wall post.
  */
@@ -123,6 +129,8 @@ public class VKApiPost extends VKAttachments.VKApiAttachment implements Identifi
      */
     public String post_type;
 
+    public String dateString;
+
     /**
      * Information about attachments to the post (photos, links, etc.), if any;
      */
@@ -143,9 +151,12 @@ public class VKApiPost extends VKAttachments.VKApiAttachment implements Identifi
      */
     public VKList<VKApiPost> copy_history;
 
-	public VKApiPost(JSONObject from) throws JSONException
-	{
+    public ArrayList<String> photos = new ArrayList<>();
+
+	public VKApiPost(JSONObject from) throws JSONException {
 		parse(from);
+        photos = getPhotos();
+        dateString = createDateString();
 	}
     /**
      * Fills a Post instance from JSONObject.
@@ -211,13 +222,16 @@ public class VKApiPost extends VKAttachments.VKApiAttachment implements Identifi
         this.attachments = in.readParcelable(VKAttachments.class.getClassLoader());
         this.geo = in.readParcelable(VKApiPlace.class.getClassLoader());
         this.signer_id = in.readInt();
+        //in.readStringList(this.photos604);
+        photos = getPhotos();
+        dateString = createDateString();
     }
 
     /**
      * Creates empty Post instance.
      */
     public VKApiPost() {
-
+        photos = getPhotos();
     }
 
     @Override
@@ -273,5 +287,41 @@ public class VKApiPost extends VKAttachments.VKApiAttachment implements Identifi
             return new VKApiPost[size];
         }
     };
+
+    private ArrayList<String> getPhotos(){
+        ArrayList<String> res = new ArrayList<>();
+
+        for (int i = 0; i < attachments.size(); i++) {
+            VKAttachments.VKApiAttachment attachment = attachments.get(i);
+            if( attachment.getType().equals(VKAttachments.TYPE_PHOTO) ) {
+                VKApiPhoto vkApiPhoto = (VKApiPhoto) attachment;
+                String url = "";
+                if( !vkApiPhoto.photo_2560.isEmpty() ){
+                    url = vkApiPhoto.photo_2560;
+                }else if(!vkApiPhoto.photo_1280.isEmpty()){
+                    url = vkApiPhoto.photo_1280;
+                } else if (!vkApiPhoto.photo_807.isEmpty()) {
+                    url = vkApiPhoto.photo_807;
+                }else if(!vkApiPhoto.photo_604.isEmpty()){
+                    url = vkApiPhoto.photo_604;
+                }else if(!vkApiPhoto.photo_130.isEmpty()){
+                    url = vkApiPhoto.photo_130;
+                }else if(!vkApiPhoto.photo_75.isEmpty()){
+                    url = vkApiPhoto.photo_75;
+                }
+                res.add(url);
+            }
+        }
+
+        return res;
+    }
+
+    private String createDateString(){
+        Date d = new Date(date*1000);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(d);
+        calendar.setTimeZone(TimeZone.getDefault());
+        return new SimpleDateFormat("HH:mm dd.MM").format(calendar.getTime());
+    }
 
 }

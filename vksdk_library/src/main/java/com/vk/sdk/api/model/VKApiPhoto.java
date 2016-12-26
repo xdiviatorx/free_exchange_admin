@@ -223,6 +223,24 @@ public class VKApiPhoto extends VKAttachments.VKApiAttachment implements Parcela
         this.access_key = in.readString();
     }
 
+    public String getPhoto(){
+        String url = "";
+        if( !photo_2560.isEmpty() ){
+            url=photo_2560;
+        }else if( !photo_1280.isEmpty()){
+            url=photo_1280;
+        }else if( !photo_807.isEmpty()){
+            url=photo_807;
+        }else if( !photo_604.isEmpty()){
+            url=photo_604;
+        }else if( !photo_130.isEmpty()){
+            url=photo_130;
+        }else if( !photo_75.isEmpty()){
+            url=photo_75;
+        }
+        return url;
+    }
+
     /**
      * Init photo object with attachment string like photo45898586_334180483
      * @param photoAttachmentString string of format photo[OWNER_ID]_[PHOTO_ID]

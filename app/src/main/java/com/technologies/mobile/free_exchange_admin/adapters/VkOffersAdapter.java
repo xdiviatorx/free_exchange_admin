@@ -11,25 +11,24 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.technologies.mobile.free_exchange_admin.R;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnButtonClickCallback;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnImageSetClickCallback;
-import com.technologies.mobile.free_exchange_admin.rest.model.VkPost;
-import com.technologies.mobile.free_exchange_admin.views.AttachmentsLayout;
 import com.technologies.mobile.free_exchange_admin.views.AutomaticPhotoLayout;
+import com.vk.sdk.api.model.VKApiPhoto;
 import com.vk.sdk.api.model.VKApiPost;
 import com.vk.sdk.api.model.VKAttachments;
 import com.vk.sdk.api.model.VKPostArray;
-import com.vk.sdk.api.model.VKWallPostResult;
 
-import org.json.JSONException;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by diviator on 01.11.2016.
@@ -46,7 +45,7 @@ public class VkOffersAdapter extends BaseAdapter {
     private Context mContext;
     private int mResource;
 
-    private ArrayList<VkPost> mData;
+    private ArrayList<VKApiPost> mData;
 
     public VkOffersAdapter(Context context, int resource) {
         mContext = context;
@@ -60,7 +59,7 @@ public class VkOffersAdapter extends BaseAdapter {
     }
 
     @Override
-    public VkPost getItem(int i) {
+    public VKApiPost getItem(int i) {
         return mData.get(i);
     }
 
@@ -70,11 +69,13 @@ public class VkOffersAdapter extends BaseAdapter {
     }
 
     private class ViewHolder {
+        LinearLayout llContent;
         TextView tvOffer;
         AutomaticPhotoLayout aplPhotos;
-        ImageButton bReject;
-        ImageButton bAccept;
-        LinearLayout llContent;
+        TextView tvDate;
+        Button bReject;
+        Button bAccept;
+
     }
 
     @Override
@@ -87,27 +88,28 @@ public class VkOffersAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.tvOffer = (TextView) view.findViewById(R.id.tvOffer);
             viewHolder.aplPhotos = (AutomaticPhotoLayout) view.findViewById(R.id.aplPhotos);
-            viewHolder.bAccept = (ImageButton) view.findViewById(R.id.bAccept);
-            viewHolder.bReject = (ImageButton) view.findViewById(R.id.bReject);
+            viewHolder.bAccept = (Button) view.findViewById(R.id.bAccept);
+            viewHolder.bReject = (Button) view.findViewById(R.id.bReject);
             viewHolder.llContent = (LinearLayout) view.findViewById(R.id.llContent);
+            viewHolder.tvDate = (TextView) view.findViewById(R.id.tvDate);
             view.setTag(viewHolder);
         }
 
         fitWidthToScreen(viewHolder.llContent);
 
-        viewHolder.tvOffer.setText(getItem(pos).getText());
-        ArrayList<String> photos = getItem(pos).getPhotoArray(VkPost.SIZE_604);
+        viewHolder.tvOffer.setText(getItem(pos).text);
         viewHolder.aplPhotos.removeAll();
-        for (int i = 0; i < photos.size(); i++) {
-            //Log.e(LOG_TAG, "Photo " + pos + " " + i + " = " + photos.get(i));
-            viewHolder.aplPhotos.addPhoto(photos.get(i));
-        }
+
+        ArrayList<String> photos = getItem(pos).photos;
+        viewHolder.aplPhotos.addPhotos(photos);
 
         viewHolder.bAccept.setOnClickListener(new OnButtonClickListener(pos));
         viewHolder.bReject.setOnClickListener(new OnButtonClickListener(pos));
 
-        ArrayList<String> bigPhotos = getItem(pos).getPhotoArray(VkPost.SIZE_604);
-        viewHolder.aplPhotos.setOnClickListener(new OnImageSetClickListener(bigPhotos.toArray(new String[bigPhotos.size()])));
+        viewHolder.aplPhotos.setOnClickListener(new OnImageSetClickListener(photos.toArray(new String[photos.size()])));
+
+
+        viewHolder.tvDate.setText(getItem(pos).dateString);
 
         return view;
     }
@@ -122,12 +124,20 @@ public class VkOffersAdapter extends BaseAdapter {
         linearLayout.setLayoutParams(lp);
     }
 
-    public void addPost(VkPost[] vkPosts) {
-        mData.addAll(Arrays.asList(vkPosts));
+    public void addPost(VKPostArray vkPostArray) {
+        for( int i = 0; i < vkPostArray.size(); i++ ){
+            mData.add(vkPostArray.get(i));
+        }
     }
 
     public void deletePost(int pos) {
         mData.remove(pos);
+        notifyDataSetChanged();
+    }
+
+    public void clear(){
+        mData = new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     private class OnButtonClickListener implements View.OnClickListener {

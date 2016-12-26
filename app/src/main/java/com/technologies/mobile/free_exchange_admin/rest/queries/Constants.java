@@ -10,5 +10,8 @@ public interface Constants {
 
     String FILTER = "filter";
     String SUGGESTS = "suggests";
+    String POSTPONED = "postponed";
+
+    String CHAT_ID = "chat_id";
 
 }

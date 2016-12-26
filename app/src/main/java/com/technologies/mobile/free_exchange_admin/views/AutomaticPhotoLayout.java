@@ -3,6 +3,7 @@ package com.technologies.mobile.free_exchange_admin.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -10,6 +11,8 @@ import android.widget.TableRow;
 import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.technologies.mobile.free_exchange_admin.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by diviator on 07.11.2016.
@@ -31,6 +34,12 @@ public class AutomaticPhotoLayout extends TableLayout {
 
     public AutomaticPhotoLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
+
+    public void addPhotos(ArrayList<String> urlList){
+        for( String url : urlList) {
+            addPhoto(url);
+        }
     }
 
     public void addPhoto(String url) {
@@ -79,13 +88,13 @@ public class AutomaticPhotoLayout extends TableLayout {
     private int mGetTableHeight(int index) {
         switch (index) {
             case FIRST_COLUMN_INDEX: {
-                return 200;
+                return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,200,getResources().getDisplayMetrics());
             }
             case SECOND_COLUMN_INDEX: {
-                return 150;
+                return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,150,getResources().getDisplayMetrics());
             }
             case THIRD_COLUMN_INDEX: {
-                return 70;
+                return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,80,getResources().getDisplayMetrics());
             }
             default:{
                 return 0;
@@ -101,7 +110,11 @@ public class AutomaticPhotoLayout extends TableLayout {
         imageView.setMinimumWidth(1000);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        Picasso.with(getContext()).load(url).into(imageView);
+        if( !url.isEmpty() ) {
+            Glide.with(getContext()).load(url).into(imageView);
+        }else{
+            imageView.setImageResource(R.drawable.no_photo_big);
+        }
 
         Log.e(LOG_TAG,"image added");
 

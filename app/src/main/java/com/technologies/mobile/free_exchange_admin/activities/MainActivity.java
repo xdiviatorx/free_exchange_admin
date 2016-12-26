@@ -1,6 +1,10 @@
 package com.technologies.mobile.free_exchange_admin.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -8,37 +12,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.ListView;
 
 import com.technologies.mobile.free_exchange_admin.R;
-import com.technologies.mobile.free_exchange_admin.adapters.VkOffersAdapter;
-import com.technologies.mobile.free_exchange_admin.callbacks.OnButtonClickCallback;
-import com.technologies.mobile.free_exchange_admin.callbacks.OnDownloadListener;
-import com.technologies.mobile.free_exchange_admin.callbacks.OnImageSetClickCallback;
-import com.technologies.mobile.free_exchange_admin.rest.model.VkPost;
-import com.technologies.mobile.free_exchange_admin.rest.queries.VkGetOffers;
-import com.technologies.mobile.free_exchange_admin.rest.queries.VkPostOffer;
+import com.technologies.mobile.free_exchange_admin.adapters.ViewPagerAdapter;
+import com.technologies.mobile.free_exchange_admin.fragments.ApprovedOffersFragment;
+import com.technologies.mobile.free_exchange_admin.fragments.RejectedOffersFragment;
+import com.technologies.mobile.free_exchange_admin.fragments.WaitingSiteOffersFragment;
+import com.technologies.mobile.free_exchange_admin.fragments.WaitingVkOffersFragment;
+import com.technologies.mobile.free_exchange_admin.rest.queries.VkChatFinder;
+import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKSdk;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.api.model.VKApiPost;
-import com.vk.sdk.api.model.VKPostArray;
-import com.vk.sdk.util.VKUtil;
 
-public class MainActivity extends AppCompatActivity implements
-        OnDownloadListener, OnButtonClickCallback, AbsListView.OnScrollListener, OnImageSetClickCallback{
+public class MainActivity extends AppCompatActivity{
+
+    public static final String LOG_TAG = "mainActivity";
+
+    public static final int OFFER_REQUEST = 200;
 
     public static final int LOGIN_REQUEST = 100;
 
     Toolbar toolbar;
 
-    ListView lvOffers;
-    VkOffersAdapter mVkOffersAdapter;
-
-    VkGetOffers vkGetOffers;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,20 +51,21 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initViews() {
         initToolbar();
-        initList();
+
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
-    private void initList() {
-        lvOffers = (ListView) findViewById(R.id.lvOffers);
-        mVkOffersAdapter = new VkOffersAdapter(this, R.layout.item_offer);
-        mVkOffersAdapter.setOnButtonClickCallback(this);
-        mVkOffersAdapter.setOnImageSetClickCallback(this);
-        lvOffers.setAdapter(mVkOffersAdapter);
-
-        vkGetOffers = new VkGetOffers();
-        vkGetOffers.setOnDownloadListener(this);
-        vkGetOffers.init();
-        lvOffers.setOnScrollListener(this);
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new WaitingSiteOffersFragment(), "Сайт\nОжидание");
+        adapter.addFragment(new WaitingVkOffersFragment(), "ВК\nОжидание");
+        adapter.addFragment(new RejectedOffersFragment(), "\nОтклонено");
+        adapter.addFragment(new ApprovedOffersFragment(), "\nОдобрено");
+        viewPager.setAdapter(adapter);
     }
 
     private void login() {
@@ -90,6 +87,12 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.logout: {
                 VKSdk.logout();
+
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+                Log.e(LOG_TAG,"CHAT ID BEFORE REMOVING = " + sp.getInt(VkChatFinder.REJECT_CHAT_ID_PREFERENCES,-1));
+                sp.edit().remove(VkChatFinder.REJECT_CHAT_ID_PREFERENCES).apply();
+                Log.e(LOG_TAG,"CHAT ID AFTER REMOVING = " + sp.getInt(VkChatFinder.REJECT_CHAT_ID_PREFERENCES,-1));
+
                 login();
                 break;
             }
@@ -98,56 +101,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPostsDownloaded(VkPost[] vkPosts) {
-        mVkOffersAdapter.addPost(vkPosts);
-        mVkOffersAdapter.notifyDataSetChanged();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST) {
             initViews();
         }
-    }
-
-    @Override
-    public void onButtonClick(int type, int pos) {
-        switch (type) {
-            case ButtonType.ACCEPT: {
-                VkPostOffer vkPostOffer = new VkPostOffer(mVkOffersAdapter.getItem(pos));
-                long postId = mVkOffersAdapter.getItemId(pos);
-                vkPostOffer.accept(postId);
-                mVkOffersAdapter.deletePost(pos);
-                break;
-            }
-            case ButtonType.REJECT: {
-                VkPostOffer vkPostOffer = new VkPostOffer(mVkOffersAdapter.getItem(pos));
-                long postId = mVkOffersAdapter.getItemId(pos);
-                vkPostOffer.reject(postId);
-                mVkOffersAdapter.deletePost(pos);
-                break;
-            }
-        }
-        mVkOffersAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView absListView, int i) {
-
-    }
-
-    @Override
-    public void onScroll(AbsListView absListView, int i, int i1, int i2) {
-        if (i >= Math.max(i2 - 10, 10)) {
-            vkGetOffers.additionalDownloading(i2);
-        }
-    }
-
-    @Override
-    public void onImageSetClick(String[] urls) {
-        Intent intent = new Intent(this,ImagePreviewActivity.class);
-        intent.putExtra(ImagePreviewActivity.IMAGES,urls);
-        startActivity(intent);
     }
 }
