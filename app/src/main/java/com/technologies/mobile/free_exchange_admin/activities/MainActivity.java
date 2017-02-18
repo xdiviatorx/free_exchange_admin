@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity{
         initToolbar();
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setOffscreenPageLimit(4);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);

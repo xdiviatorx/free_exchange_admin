@@ -2,7 +2,9 @@ package com.technologies.mobile.free_exchange_admin.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -73,6 +75,8 @@ public class OffersAdapter extends BaseAdapter {
         TextView tvOffer;
         AutomaticPhotoLayout aplPhotos;
         LinearLayout llContent;
+        TextView tvDate;
+        TextView tvName;
     }
 
     @Override
@@ -99,6 +103,8 @@ public class OffersAdapter extends BaseAdapter {
             viewHolder.tvOffer = (TextView) convertView.findViewById(R.id.tvOffer);
             viewHolder.aplPhotos = (AutomaticPhotoLayout) convertView.findViewById(R.id.aplPhotos);
             viewHolder.llContent = (LinearLayout) convertView.findViewById(R.id.llContent);
+            viewHolder.tvDate = (TextView) convertView.findViewById(R.id.tvDate);
+            viewHolder.tvName = (TextView) convertView.findViewById(R.id.tvName);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -118,6 +124,16 @@ public class OffersAdapter extends BaseAdapter {
             }
         }
         viewHolder.aplPhotos.setOnClickListener(new OnImageClickListener(pos));
+
+        viewHolder.tvDate.setText(getItem(pos).getDateString());
+
+        if( getItem(pos).getUserData() != null && getItem(pos).getUserData().getName() != null ) {
+            viewHolder.tvName.setText(getItem(pos).getUserData().getName());
+            viewHolder.tvName.setTextColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
+        }else{
+            viewHolder.tvName.setText(R.string.author_not_identify);
+            viewHolder.tvName.setTextColor(ContextCompat.getColor(mContext,R.color.colorAccent));
+        }
 
         return convertView;
     }

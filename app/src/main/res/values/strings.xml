@@ -42,4 +42,16 @@
 
     <string name="message_to_chat_error">Идентификатор чата отклоненных не определен.\nСообщение не отправлено.</string>
     <string name="message_to_chat_success">Сообщение в чат отклоненных успешно отправлено.</string>
+
+    <!-- author name and messages -->
+
+    <string name="author_not_identify">Автор не определён</string>
+
+    <string name="message_to_user_success">Сообщение успешно отправлено.</string>
+
+    <string name="message_text">Текст сообщения</string>
+
+    <string name="send">Отправить</string>
+    <string name="cancel">Отмена</string>
+
 </resources>

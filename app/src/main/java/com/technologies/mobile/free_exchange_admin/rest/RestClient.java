@@ -2,6 +2,7 @@ package com.technologies.mobile.free_exchange_admin.rest;
 
 import com.technologies.mobile.free_exchange_admin.rest.model.CheckResponse;
 import com.technologies.mobile.free_exchange_admin.rest.model.GetOffersResponse;
+import com.technologies.mobile.free_exchange_admin.rest.model.IpUrl;
 import com.technologies.mobile.free_exchange_admin.rest.model.SimpleResponse;
 
 import org.json.JSONArray;
@@ -60,5 +61,8 @@ public interface RestClient {
     Call<CheckResponse> editAndCheckOffer(@Field("post_id") int postId, @Field("text") String message,
                                           @Field("photos") JSONArray photos, @Field("APIKey") String apiKey);
 
+    @FormUrlEncoded
+    @POST("API/getIPUrl")
+    Call<IpUrl> getIpUrl(@Field("APIKey") String apiKey);
 
 }

@@ -13,6 +13,7 @@ public class OfferDialogActivity extends AppCompatActivity implements View.OnCli
     public static final String LOG_TAG = "OfferDialog";
 
     public static final String OFFER = "OFFER";
+    public static final String VK_USER = "VK_USER";
 
     public static final int RESULT_DELETED = 137;
 

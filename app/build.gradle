@@ -42,8 +42,8 @@ android {
         applicationId "com.technologies.mobile.free_exchange_admin"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 6
-        versionName "1.0.5"
+        versionCode 10
+        versionName "1.0.10"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

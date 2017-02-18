@@ -17,6 +17,8 @@ import android.widget.TextView;
 import com.technologies.mobile.free_exchange_admin.R;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnButtonClickCallback;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnImageSetClickCallback;
+import com.technologies.mobile.free_exchange_admin.callbacks.OnUserNameClickListener;
+import com.technologies.mobile.free_exchange_admin.rest.model.VkUser;
 import com.technologies.mobile.free_exchange_admin.views.AutomaticPhotoLayout;
 import com.vk.sdk.api.model.VKApiPhoto;
 import com.vk.sdk.api.model.VKApiPost;
@@ -27,7 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -42,15 +46,19 @@ public class VkOffersAdapter extends BaseAdapter {
 
     private OnImageSetClickCallback onImageSetClickCallback;
 
+    private OnUserNameClickListener onUserNameClickListener;
+
     private Context mContext;
     private int mResource;
 
     private ArrayList<VKApiPost> mData;
+    private Map<Long,VkUser> mVkUsersMap;
 
     public VkOffersAdapter(Context context, int resource) {
         mContext = context;
         mResource = resource;
         mData = new ArrayList<>();
+        mVkUsersMap = new HashMap<>();
     }
 
     @Override
@@ -62,6 +70,8 @@ public class VkOffersAdapter extends BaseAdapter {
     public VKApiPost getItem(int i) {
         return mData.get(i);
     }
+
+
 
     @Override
     public long getItemId(int i) {
@@ -75,7 +85,7 @@ public class VkOffersAdapter extends BaseAdapter {
         TextView tvDate;
         Button bReject;
         Button bAccept;
-
+        TextView tvName;
     }
 
     @Override
@@ -92,6 +102,7 @@ public class VkOffersAdapter extends BaseAdapter {
             viewHolder.bReject = (Button) view.findViewById(R.id.bReject);
             viewHolder.llContent = (LinearLayout) view.findViewById(R.id.llContent);
             viewHolder.tvDate = (TextView) view.findViewById(R.id.tvDate);
+            viewHolder.tvName = (TextView) view.findViewById(R.id.tvName);
             view.setTag(viewHolder);
         }
 
@@ -108,8 +119,10 @@ public class VkOffersAdapter extends BaseAdapter {
 
         viewHolder.aplPhotos.setOnClickListener(new OnImageSetClickListener(photos.toArray(new String[photos.size()])));
 
-
         viewHolder.tvDate.setText(getItem(pos).dateString);
+
+        viewHolder.tvName.setText(getUser(getItem(pos).from_id).getFullName());
+        viewHolder.tvName.setOnClickListener(new OnButtonClickListener(pos));
 
         return view;
     }
@@ -128,6 +141,14 @@ public class VkOffersAdapter extends BaseAdapter {
         for( int i = 0; i < vkPostArray.size(); i++ ){
             mData.add(vkPostArray.get(i));
         }
+    }
+
+    public void addUsers(Map<Long,VkUser> vkUserMap){
+        mVkUsersMap.putAll(vkUserMap);
+    }
+
+    public VkUser getUser(long id){
+        return mVkUsersMap.get(id);
     }
 
     public void deletePost(int pos) {
@@ -163,6 +184,14 @@ public class VkOffersAdapter extends BaseAdapter {
                     }
                     break;
                 }
+                case R.id.tvName:{
+                    if(onUserNameClickListener != null){
+                        VKApiPost vkApiPost = getItem(pos);
+                        VkUser vkUser = getUser(vkApiPost.from_id);
+                        onUserNameClickListener.onUserNameClicked(vkApiPost,vkUser);
+                    }
+                    break;
+                }
             }
         }
     }
@@ -192,5 +221,9 @@ public class VkOffersAdapter extends BaseAdapter {
 
     public void setOnImageSetClickCallback(OnImageSetClickCallback onImageSetClickCallback) {
         this.onImageSetClickCallback = onImageSetClickCallback;
+    }
+
+    public void setOnUserNameClickListener(OnUserNameClickListener onUserNameClickListener) {
+        this.onUserNameClickListener = onUserNameClickListener;
     }
 }

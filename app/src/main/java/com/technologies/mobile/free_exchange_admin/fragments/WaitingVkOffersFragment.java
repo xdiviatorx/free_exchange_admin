@@ -1,16 +1,20 @@
 package com.technologies.mobile.free_exchange_admin.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.technologies.mobile.free_exchange_admin.R;
 import com.technologies.mobile.free_exchange_admin.activities.ImagePreviewActivity;
@@ -18,14 +22,19 @@ import com.technologies.mobile.free_exchange_admin.activities.EditOfferVkActivit
 import com.technologies.mobile.free_exchange_admin.activities.VkRejectDialogActivity;
 import com.technologies.mobile.free_exchange_admin.adapters.VkOffersAdapter;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnButtonClickCallback;
+import com.technologies.mobile.free_exchange_admin.callbacks.OnUserNameClickListener;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnVkDownloadListener;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnImageSetClickCallback;
+import com.technologies.mobile.free_exchange_admin.rest.model.VkUser;
 import com.technologies.mobile.free_exchange_admin.rest.queries.VkGetOffers;
+import com.technologies.mobile.free_exchange_admin.rest.queries.VkMessageSender;
 import com.vk.sdk.api.model.VKApiPhoto;
+import com.vk.sdk.api.model.VKApiPost;
 import com.vk.sdk.api.model.VKAttachments;
 import com.vk.sdk.api.model.VKPostArray;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import static com.technologies.mobile.free_exchange_admin.activities.MainActivity.OFFER_REQUEST;
 
@@ -34,7 +43,8 @@ import static com.technologies.mobile.free_exchange_admin.activities.MainActivit
  */
 
 public class WaitingVkOffersFragment extends Fragment implements
-        OnVkDownloadListener, OnButtonClickCallback, AbsListView.OnScrollListener, OnImageSetClickCallback, SwipeRefreshLayout.OnRefreshListener {
+        OnVkDownloadListener, OnButtonClickCallback, AbsListView.OnScrollListener,
+        OnImageSetClickCallback, SwipeRefreshLayout.OnRefreshListener, OnUserNameClickListener {
 
     public static final int REJECT_REQUEST = 78;
 
@@ -70,9 +80,10 @@ public class WaitingVkOffersFragment extends Fragment implements
         tvOffersCount = (TextView) includeView.findViewById(R.id.tvOffersCount);
 
         lvOffers = (ListView) view.findViewById(R.id.lvOffers);
-        mVkOffersAdapter = new VkOffersAdapter(getContext(), R.layout.item_offer);
+        mVkOffersAdapter = new VkOffersAdapter(getContext(), R.layout.item_vk_offer);
         mVkOffersAdapter.setOnButtonClickCallback(this);
         mVkOffersAdapter.setOnImageSetClickCallback(this);
+        mVkOffersAdapter.setOnUserNameClickListener(this);
         lvOffers.setAdapter(mVkOffersAdapter);
 
         vkGetOffers = new VkGetOffers();
@@ -85,10 +96,13 @@ public class WaitingVkOffersFragment extends Fragment implements
     }
 
     @Override
-    public void onPostsDownloaded(VKPostArray vkPostArray, int count) {
+    public void onPostsDownloaded(VKPostArray vkPostArray, Map<Long,VkUser> userMap, int count) {
+        mVkOffersAdapter.addUsers(userMap);
         mVkOffersAdapter.addPost(vkPostArray);
         mVkOffersAdapter.notifyDataSetChanged();
+
         srl.setRefreshing(false);
+
         mOffersCount=count;
         tvOffersCount.setText(String.valueOf(count));
     }
@@ -122,6 +136,7 @@ public class WaitingVkOffersFragment extends Fragment implements
                 mLastPosition = pos;
                 Intent intent = new Intent(getContext(), VkRejectDialogActivity.class);
                 intent.putExtra(VkRejectDialogActivity.OFFER, mVkOffersAdapter.getItem(pos));
+                intent.putExtra(VkRejectDialogActivity.VK_USER, mVkOffersAdapter.getUser(mVkOffersAdapter.getItem(pos).from_id));
                 startActivityForResult(intent, REJECT_REQUEST);
                 break;
             }
@@ -167,5 +182,24 @@ public class WaitingVkOffersFragment extends Fragment implements
     public void onRefresh() {
         mVkOffersAdapter.clear();
         vkGetOffers.init();
+    }
+
+    @Override
+    public void onUserNameClicked(final VKApiPost vkApiPost, final VkUser vkUser) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final View content = LayoutInflater.from(getContext()).inflate(R.layout.dialog_send_message,null,false);
+        builder.setView(content)
+                .setTitle(vkUser.getFullName())
+                .setCancelable(true)
+                .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String message = ((EditText)content.findViewById(R.id.etMessageText)).getText().toString();
+                        VkMessageSender messageSender = new VkMessageSender(getContext());
+                        messageSender.sendMessageToUser(vkUser.getId(),message);
+                    }
+                })
+                .setNegativeButton(R.string.cancel,null);
+        builder.create().show();
     }
 }

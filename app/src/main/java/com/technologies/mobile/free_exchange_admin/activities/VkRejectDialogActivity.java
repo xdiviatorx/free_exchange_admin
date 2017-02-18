@@ -8,6 +8,7 @@ import com.technologies.mobile.free_exchange_admin.R;
 import com.technologies.mobile.free_exchange_admin.rest.RestClient;
 import com.technologies.mobile.free_exchange_admin.rest.RetrofitService;
 import com.technologies.mobile.free_exchange_admin.rest.model.SimpleResponse;
+import com.technologies.mobile.free_exchange_admin.rest.model.VkUser;
 import com.technologies.mobile.free_exchange_admin.rest.queries.VkMessageSender;
 import com.technologies.mobile.free_exchange_admin.rest.queries.VkOfferQueries;
 import com.technologies.mobile.free_exchange_admin.views.AutomaticPhotoLayout;
@@ -23,9 +24,11 @@ import static com.technologies.mobile.free_exchange_admin.fragments.RejectedOffe
 public class VkRejectDialogActivity extends OfferDialogActivity{
 
     private VKApiPost vkApiPost;
+    private VkUser vkUser;
 
     protected void initPost(){
         vkApiPost = getIntent().getParcelableExtra(OFFER);
+        vkUser = getIntent().getParcelableExtra(VK_USER);
 
         TextView tvOfferText = (TextView) findViewById(R.id.tvOffer);
         tvOfferText.setText(vkApiPost.text);
@@ -38,7 +41,7 @@ public class VkRejectDialogActivity extends OfferDialogActivity{
 
     protected void query(){
         VkMessageSender vkMessageSender = new VkMessageSender(this);
-        vkMessageSender.sendRejectMessage(vkApiPost.from_id,vkApiPost.text,mEtRejectMessage.getText().toString());
+        vkMessageSender.sendRejectMessage(vkApiPost.from_id,vkUser.getFullName(),vkApiPost.text,mEtRejectMessage.getText().toString());
 
         RestClient client = RetrofitService.createService(RestClient.class);
         Log.e(LOG_TAG,"ID = " + vkApiPost.getId()+"");

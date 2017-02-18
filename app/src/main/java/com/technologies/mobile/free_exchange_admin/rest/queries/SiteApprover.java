@@ -1,5 +1,8 @@
 package com.technologies.mobile.free_exchange_admin.rest.queries;
 
+import android.util.Log;
+
+import com.technologies.mobile.free_exchange_admin.callbacks.VkPhotoUploadedListener;
 import com.technologies.mobile.free_exchange_admin.logic.VkPhotoConverter;
 import com.technologies.mobile.free_exchange_admin.rest.RestClient;
 import com.technologies.mobile.free_exchange_admin.rest.RetrofitService;
@@ -12,6 +15,8 @@ import com.vk.sdk.api.model.VKAttachments;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -76,23 +81,41 @@ public class SiteApprover extends Approver {
 
     @Override
     protected void publishVk() {
-        VkOfferQueries vkOfferQueries = new VkOfferQueries(null);
-        VKAttachments attachments = new VKAttachments(mVkApiPhotos);
-        vkOfferQueries.createPost(createMessage(),attachments);
+        VkPhotoUploader uploader = new VkPhotoUploader();
+        uploader.setVkPhotoUploadedListener(new VkPhotoUploadedListener() {
+            @Override
+            public void onAttachmentsUploaded(VKAttachments attachments) {
+                VkOfferQueries vkOfferQueries = new VkOfferQueries(null);
+                //VKAttachments attachments = new VKAttachments(mVkApiPhotos);
+                vkOfferQueries.createPost(createMessage(),attachments);
+            }
+        });
+        if( mOffer.getPhotosArray() != null ) {
+            uploader.uploadPhotos(mOffer.getPhotosArray());
+        }
     }
 
     @Override
-    protected void publishVk(long unixTime) {
-        VkOfferQueries vkOfferQueries = new VkOfferQueries(null);
-        VKAttachments attachments = new VKAttachments(mVkApiPhotos);
-        vkOfferQueries.createPost(createMessage(),attachments,unixTime);
+    protected void publishVk(final long unixTime) {
+        VkPhotoUploader uploader = new VkPhotoUploader();
+        uploader.setVkPhotoUploadedListener(new VkPhotoUploadedListener() {
+            @Override
+            public void onAttachmentsUploaded(VKAttachments attachments) {
+                VkOfferQueries vkOfferQueries = new VkOfferQueries(null);
+                //VKAttachments attachments = new VKAttachments(mVkApiPhotos);
+                vkOfferQueries.createPost(createMessage(),attachments,unixTime);
+            }
+        });
+        if( mOffer.getPhotosArray() != null ) {
+            uploader.uploadPhotos(mOffer.getPhotosArray());
+        }
     }
 
     private String createMessage(){
         String message = mMessage;
         message += "\n\n";
-        if( mOffer.getUserData() != null && mOffer.getUserData().getVkId() != null ) {
-            message += "@id" + mOffer.getUserData().getVkId();
+        if( mOffer.getUserData() != null && mOffer.getUserData().getVkId() != null && mOffer.getUserData().getName() != null) {
+            message += "[id" + mOffer.getUserData().getVkId() + "|" + mOffer.getUserData().getName() + "]";
         }
         return message;
     }

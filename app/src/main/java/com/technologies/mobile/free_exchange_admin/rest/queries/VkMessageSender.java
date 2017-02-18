@@ -20,47 +20,71 @@ public class VkMessageSender {
 
     private Context mContext;
 
-    public VkMessageSender(Context context){
+    public VkMessageSender(Context context) {
         mContext = context;
     }
 
-    public void sendRejectMessage(int authorId, String postText, String comment){
-        int chatId = PreferenceManager.getDefaultSharedPreferences(mContext).getInt(VkChatFinder.REJECT_CHAT_ID_PREFERENCES,-1);
-        if( chatId == -1 ){
-            Toast.makeText(mContext, R.string.message_to_chat_error,Toast.LENGTH_LONG).show();
-        }else{
-            sendMessageToChat(createRejectMessage(authorId,postText,comment),chatId);
+    public void sendRejectMessage(int authorId, String fullName, String postText, String comment) {
+        int chatId = PreferenceManager.getDefaultSharedPreferences(mContext).getInt(VkChatFinder.REJECT_CHAT_ID_PREFERENCES, -1);
+        if (chatId == -1) {
+            Toast.makeText(mContext, R.string.message_to_chat_error, Toast.LENGTH_LONG).show();
+        } else {
+            sendMessageToChat(createRejectMessage(authorId, fullName, postText, comment), chatId);
         }
     }
 
-    public void sendMessageToChat(String message, int chatId){
+    private void sendMessageToChat(String message, int chatId) {
         VKParameters params = new VKParameters();
-        params.put(Constants.CHAT_ID,chatId);
-        params.put(VKApiConst.MESSAGE,message);
-        VKRequest request = new VKRequest("messages.send",params);
+        params.put(Constants.CHAT_ID, chatId);
+        params.put(VKApiConst.MESSAGE, message);
+        VKRequest request = new VKRequest("messages.send", params);
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                Toast.makeText(mContext,R.string.message_to_chat_success,Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, R.string.message_to_chat_success, Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onError(VKError error) {
                 super.onError(error);
-                Toast.makeText(mContext,error.toString(),Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, error.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private String createRejectMessage(int authorId, String postText, String comment){
+    private String createRejectMessage(int authorId, String fullName, String postText, String comment) {
         String message = "";
 
-        message+= "[id" + authorId + "|автор]" + " " + authorId+"\n\n";
-        message+=postText+"\n\n";
-        message+=comment;
+        message += "[id" + authorId + "|" + fullName + "]" + "\n\n";
+        message += postText + "\n\n";
+        message += comment;
 
         return message;
+    }
+
+    public void sendMessageToUser(long userId, String message){
+        sendMessage(userId,message);
+    }
+
+    private void sendMessage(long userId, String message) {
+        VKParameters params = new VKParameters();
+        params.put(VKApiConst.USER_ID, userId);
+        params.put(VKApiConst.MESSAGE, message);
+        VKRequest request = new VKRequest("messages.send", params);
+        request.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                Toast.makeText(mContext, R.string.message_to_user_success, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(VKError error) {
+                super.onError(error);
+                Toast.makeText(mContext, error.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }

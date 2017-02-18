@@ -1,6 +1,8 @@
 package com.technologies.mobile.free_exchange_admin.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,7 @@ public class SiteOffersAdapter extends OffersAdapter {
         TextView tvDate;
         Button bAccept;
         Button bReject;
+        TextView tvName;
     }
 
     @Override
@@ -50,6 +53,7 @@ public class SiteOffersAdapter extends OffersAdapter {
             viewHolder.bAccept = (Button) convertView.findViewById(R.id.bAccept);
             viewHolder.bReject = (Button) convertView.findViewById(R.id.bReject);
             viewHolder.tvDate = (TextView) convertView.findViewById(R.id.tvDate);
+            viewHolder.tvName = (TextView) convertView.findViewById(R.id.tvName);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -75,6 +79,14 @@ public class SiteOffersAdapter extends OffersAdapter {
 
         viewHolder.bAccept.setOnClickListener(new OnButtonClickListener(pos));
         viewHolder.bReject.setOnClickListener(new OnButtonClickListener(pos));
+
+        if( getItem(pos).getUserData() != null && getItem(pos).getUserData().getName() != null ) {
+            viewHolder.tvName.setText(getItem(pos).getUserData().getName());
+            viewHolder.tvName.setTextColor(ContextCompat.getColor(mContext,R.color.colorPrimary));
+        }else{
+            viewHolder.tvName.setText(R.string.author_not_identify);
+            viewHolder.tvName.setTextColor(ContextCompat.getColor(mContext,R.color.colorAccent));
+        }
 
         return convertView;
     }

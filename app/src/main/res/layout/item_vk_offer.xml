@@ -31,9 +31,12 @@
                     android:text=""
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp"
+                    android:gravity="center_vertical"
                     android:layout_marginTop="15dp"
                     android:paddingLeft="7dp"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:drawableLeft="@mipmap/message_dark"
+                    android:drawablePadding="5dp"/>
 
                 <TextView
                     android:id="@+id/tvDate"
@@ -46,6 +49,7 @@
                     android:text="21:03 28.12"/>
 
             </LinearLayout>
+
 
             <TextView
                 android:id="@+id/tvOffer"
@@ -61,6 +65,41 @@
                 android:layout_height="wrap_content"
                 android:shrinkColumns="*"
                 android:stretchColumns="*"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/colorLightMediumGray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <Button
+                    android:id="@+id/bReject"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/reject"
+                    android:textColor="@color/colorAccent"
+                    android:background="@color/colorTransparent"
+                    android:layout_weight="1"/>
+
+                <View
+                    android:layout_width="1px"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:background="@color/colorLightMediumGray"/>
+
+                <Button
+                    android:id="@+id/bAccept"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/prepare"
+                    android:textColor="@color/colorPrimary"
+                    android:background="@color/colorTransparent"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
