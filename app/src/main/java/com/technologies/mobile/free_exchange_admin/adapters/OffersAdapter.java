@@ -48,7 +48,7 @@ import static com.technologies.mobile.free_exchange_admin.activities.ImagePrevie
  */
 public class OffersAdapter extends BaseAdapter {
 
-    public static String LOG_TAG = "mySearchAdapter";
+    public static String TAG = "mySearchAdapter";
 
     OnDownloadListener onDownloadListener;
 
@@ -195,11 +195,14 @@ public class OffersAdapter extends BaseAdapter {
                 if( onDownloadListener != null ){
                     onDownloadListener.onDownloaded(response.body().getOffersArray().getCount());
                 }
+                Log.e(TAG, "onResponse: SUCCESS" );
+                Log.e(TAG, "onResponse: LENGTH = " + response.body().getOffersArray().getOffers().length );
             }
 
             @Override
             public void onFailure(Call<GetOffersResponse> call, Throwable t) {
                 uploading = false;
+                Log.e(TAG, "onFailure: " + t.toString());
             }
         });
 
