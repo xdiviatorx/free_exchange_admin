@@ -42,11 +42,13 @@ public interface RestClient {
 
     @FormUrlEncoded
     @POST("API/approveOffer")
-    Call<SimpleResponse> approveOffer(@Field("id") int id, @Field("type") JSONArray publishTo, @Field("APIKey") String apiKey);
+    Call<SimpleResponse> approveOffer(@Field("id") int id, @Field("type") JSONArray publishTo,
+                                      @Field("category") int category, @Field("APIKey") String apiKey);
 
     @FormUrlEncoded
     @POST("API/approveOfferVk")
-    Call<SimpleResponse> approveOfferVk(@Field("post_id") int postId, @Field("type") JSONArray publishTo, @Field("APIKey") String apiKey);
+    Call<SimpleResponse> approveOfferVk(@Field("post_id") int postId, @Field("type") JSONArray publishTo,
+                                        @Field("category") int category, @Field("APIKey") String apiKey);
 
     @FormUrlEncoded
     @POST("API/checkOfferVk")

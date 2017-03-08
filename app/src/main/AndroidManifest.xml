@@ -43,9 +43,6 @@
             android:theme="@style/DialogTheme" />
         <activity android:name=".activities.OfferDialogActivity" />
         <activity
-            android:name=".activities.SiteApproveDialogActivity"
-            android:theme="@style/DialogTheme" />
-        <activity
             android:name=".activities.EditOfferSiteActivity"
             android:screenOrientation="portrait"/>
         <meta-data

@@ -1,7 +1,5 @@
 package com.technologies.mobile.free_exchange_admin.rest.queries;
 
-import android.util.Log;
-
 import com.technologies.mobile.free_exchange_admin.callbacks.VkPhotoUploadedListener;
 import com.technologies.mobile.free_exchange_admin.logic.VkPhotoConverter;
 import com.technologies.mobile.free_exchange_admin.rest.RestClient;
@@ -15,8 +13,6 @@ import com.vk.sdk.api.model.VKAttachments;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,17 +30,19 @@ public class SiteApprover extends Approver {
     Offer mOffer;
     List<VKApiPhoto> mVkApiPhotos;
     String mMessage;
+    int mCatId;
 
-    public SiteApprover(Offer offer, String message, List<VKApiPhoto> vkApiPhotos){
+    public SiteApprover(Offer offer, String message, List<VKApiPhoto> vkApiPhotos, int catId) {
         mOffer = offer;
         mMessage = message;
         mVkApiPhotos = vkApiPhotos;
+        mCatId = catId;
     }
 
     @Override
     protected void check() {
         RestClient client = RetrofitService.createService(RestClient.class);
-        client.checkOffer(mOffer.getId(),RestClient.apiKey).enqueue(new Callback<CheckResponse>() {
+        client.checkOffer(mOffer.getId(), RestClient.apiKey).enqueue(new Callback<CheckResponse>() {
             @Override
             public void onResponse(Call<CheckResponse> call, Response<CheckResponse> response) {
                 showApproveDialog(response.body().getPublish().getCheck());
@@ -66,7 +64,7 @@ public class SiteApprover extends Approver {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        client.editAndCheckOffer(mOffer.getId(),mMessage,photos,RestClient.apiKey).enqueue(new Callback<CheckResponse>() {
+        client.editAndCheckOffer(mOffer.getId(), mMessage, photos, RestClient.apiKey).enqueue(new Callback<CheckResponse>() {
             @Override
             public void onResponse(Call<CheckResponse> call, Response<CheckResponse> response) {
                 showApproveDialog(response.body().getPublish().getCheck());
@@ -87,10 +85,10 @@ public class SiteApprover extends Approver {
             public void onAttachmentsUploaded(VKAttachments attachments) {
                 VkOfferQueries vkOfferQueries = new VkOfferQueries(null);
                 //VKAttachments attachments = new VKAttachments(mVkApiPhotos);
-                vkOfferQueries.createPost(createMessage(),attachments);
+                vkOfferQueries.createPost(createVKMessage(), attachments);
             }
         });
-        if( mOffer.getPhotosArray() != null ) {
+        if (mOffer.getPhotosArray() != null) {
             uploader.uploadPhotos(mOffer.getPhotosArray());
         }
     }
@@ -103,27 +101,29 @@ public class SiteApprover extends Approver {
             public void onAttachmentsUploaded(VKAttachments attachments) {
                 VkOfferQueries vkOfferQueries = new VkOfferQueries(null);
                 //VKAttachments attachments = new VKAttachments(mVkApiPhotos);
-                vkOfferQueries.createPost(createMessage(),attachments,unixTime);
+                vkOfferQueries.createPost(createVKMessage(), attachments, unixTime);
             }
         });
-        if( mOffer.getPhotosArray() != null ) {
+        if (mOffer.getPhotosArray() != null) {
             uploader.uploadPhotos(mOffer.getPhotosArray());
         }
     }
 
-    private String createMessage(){
+    private String createVKMessage() {
         String message = mMessage;
         message += "\n\n";
-        if( mOffer.getUserData() != null && mOffer.getUserData().getVkId() != null && mOffer.getUserData().getName() != null) {
+        if (mOffer.getUserData() != null && mOffer.getUserData().getVkId() != null && mOffer.getUserData().getName() != null) {
             message += "[id" + mOffer.getUserData().getVkId() + "|" + mOffer.getUserData().getName() + "]";
         }
+        message += "\n\n";
+        message += createVkLinks();
         return message;
     }
 
     @Override
     protected void siteSynchronization() {
         RestClient client = RetrofitService.createService(RestClient.class);
-        client.approveOffer(mOffer.getId(),createPublishTo(),RestClient.apiKey).enqueue(new Callback<SimpleResponse>() {
+        client.approveOffer(mOffer.getId(), createPublishTo(), mCatId, RestClient.apiKey).enqueue(new Callback<SimpleResponse>() {
             @Override
             public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
 

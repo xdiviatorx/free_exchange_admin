@@ -29,27 +29,29 @@ import retrofit2.Response;
  * Created by diviator on 26.11.2016.
  */
 
-public class VkApprover extends Approver implements OnVkQueryExecuted{
+public class VkApprover extends Approver implements OnVkQueryExecuted {
 
     private static String LOG_TAG = "vkApprover";
 
     VKApiPost mVkApiPost;
     String mMessage;
     List<VKApiPhoto> mVkApiPhotos;
+    int mCatId;
 
     int newPostId = -1;
 
-    public VkApprover(VKApiPost vkApiPost, String message, List<VKApiPhoto> vkApiPhotos){
+    public VkApprover(VKApiPost vkApiPost, String message, List<VKApiPhoto> vkApiPhotos, int catId) {
         mVkApiPost = vkApiPost;
         mMessage = message;
         mVkApiPhotos = vkApiPhotos;
+        mCatId = catId;
     }
 
     @Override
     protected void check() {
         RestClient restClient = RetrofitService.createService(RestClient.class);
         Log.e(LOG_TAG, "POST ID = " + mVkApiPost.getId());
-        restClient.checkOfferVk(mVkApiPost.getId(),RestClient.apiKey).enqueue(new Callback<CheckResponse>() {
+        restClient.checkOfferVk(mVkApiPost.getId(), RestClient.apiKey).enqueue(new Callback<CheckResponse>() {
             @Override
             public void onResponse(Call<CheckResponse> call, Response<CheckResponse> response) {
                 showApproveDialog(response.body().getPublish().getCheck());
@@ -57,7 +59,7 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
 
             @Override
             public void onFailure(Call<CheckResponse> call, Throwable t) {
-                Log.e(LOG_TAG,"ERROR CHECK " + t.toString());
+                Log.e(LOG_TAG, "ERROR CHECK " + t.toString());
             }
         });
     }
@@ -67,13 +69,13 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
         publish();
     }
 
-    private void publish(){
+    private void publish() {
         VKParameters params = new VKParameters();
         params.put(VKApiConst.OWNER_ID, VkGroupManager.VK_GROUP_ID);
         params.put(VKApiConst.POST_ID, mVkApiPost.id);
-        params.put(VKApiConst.MESSAGE, mMessage);
-        params.put(VKApiConst.ATTACHMENTS,new VKAttachments(mVkApiPhotos));
-        params.put(VKApiConst.PUBLISH_DATE, System.currentTimeMillis()/1000+30*24*60*60);
+        params.put(VKApiConst.MESSAGE, createVkMessage());
+        params.put(VKApiConst.ATTACHMENTS, new VKAttachments(mVkApiPhotos));
+        params.put(VKApiConst.PUBLISH_DATE, System.currentTimeMillis() / 1000 + 30 * 24 * 60 * 60);
         VKApi.wall().post(params).executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -84,21 +86,21 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
             @Override
             public void onError(VKError error) {
                 super.onError(error);
-                Log.e(LOG_TAG,"PUBLISH " + error.toString());
+                Log.e(LOG_TAG, "PUBLISH " + error.toString());
             }
         });
     }
 
-    private void edit(){
+    private void edit() {
         VKParameters params = new VKParameters();
         params.put(VKApiConst.OWNER_ID, VkGroupManager.VK_GROUP_ID);
         params.put(VKApiConst.POST_ID, mVkApiPost.id);
-        params.put(VKApiConst.MESSAGE, mMessage);
+        params.put(VKApiConst.MESSAGE, createVkMessage());
         VKAttachments attachments = new VKAttachments(mVkApiPhotos);
-        params.put(VKApiConst.ATTACHMENTS,attachments);
+        params.put(VKApiConst.ATTACHMENTS, attachments);
         params.put(VKApiConst.PUBLISH_DATE, 2000000000);
         VKRequest request = VKApi.wall().edit(params);
-        request.addExtraParameter(VKApiConst.ACCESS_TOKEN,VKAccessToken.currentToken().accessToken);
+        request.addExtraParameter(VKApiConst.ACCESS_TOKEN, VKAccessToken.currentToken().accessToken);
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -109,9 +111,13 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
             @Override
             public void onError(VKError error) {
                 super.onError(error);
-                Log.e(LOG_TAG,"EDIT " + error.toString());
+                Log.e(LOG_TAG, "EDIT " + error.toString());
             }
         });
+    }
+
+    private String createVkMessage(){
+        return mMessage + "\n\n" + createVkLinks();
     }
 
     @Override
@@ -121,15 +127,15 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
         this.site = site;
         this.telegramm = telegramm;
 
-        if( vk ){
+        if (vk) {
             publishVk();
-        }else{
+        } else {
             siteSynchronization();
         }
 
         //siteSynchronization();
 
-        if( !vk && !site ){
+        if (!vk && !site) {
             noPublishing();
         }
     }
@@ -141,15 +147,15 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
         this.site = site;
         this.telegramm = telegramm;
 
-        if( vk ){
+        if (vk) {
             publishVk(unixTime);
-        }else{
+        } else {
             siteSynchronization();
         }
 
         //siteSynchronization();
 
-        if( !vk && !site ){
+        if (!vk && !site) {
             noPublishing();
         }
     }
@@ -174,19 +180,19 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
 
     @Override
     protected void siteSynchronization() {
-        Log.e(LOG_TAG,"ID VK POST = " + mVkApiPost.getId());
-        Log.e(LOG_TAG,"TYPE = " + createPublishTo().toString());
+        Log.e(LOG_TAG, "ID VK POST = " + mVkApiPost.getId());
+        Log.e(LOG_TAG, "TYPE = " + createPublishTo().toString());
         RestClient client = RetrofitService.createService(RestClient.class);
         int id;
-        if( newPostId != -1 ){
+        if (newPostId != -1) {
             id = newPostId;
-        }else{
+        } else {
             id = mVkApiPost.getId();
         }
-        client.approveOfferVk(id,createPublishTo(),RestClient.apiKey).enqueue(new Callback<SimpleResponse>() {
+        client.approveOfferVk(id, createPublishTo(), mCatId, RestClient.apiKey).enqueue(new Callback<SimpleResponse>() {
             @Override
             public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
-                if( !isVkPublished ){
+                if (!isVkPublished) {
                     VkOfferQueries vkOfferQueries = new VkOfferQueries(mVkApiPost);
                     vkOfferQueries.reject();
                 }
@@ -194,7 +200,7 @@ public class VkApprover extends Approver implements OnVkQueryExecuted{
 
             @Override
             public void onFailure(Call<SimpleResponse> call, Throwable t) {
-                Log.e(LOG_TAG,"ERROR = " + t.toString());
+                Log.e(LOG_TAG, "ERROR = " + t.toString());
             }
         });
     }

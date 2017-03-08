@@ -93,4 +93,8 @@ public abstract class Approver {
         return res;
     }
 
+    protected String createVkLinks(){
+        return "Еще больше обменов на нашем сайте и в мобильном приложении\nobmendar.ru\nhttps://play.google.com/store/apps/details?id=com.technologies.mobile.free_exchange&rdid=com.technologies.mobile.free_exchange&pli=1";
+    }
+
 }

@@ -1,18 +1,17 @@
 package com.technologies.mobile.free_exchange_admin.activities;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
 
 import com.technologies.mobile.free_exchange_admin.R;
+import com.technologies.mobile.free_exchange_admin.model.Category;
 import com.technologies.mobile.free_exchange_admin.rest.model.Offer;
 import com.technologies.mobile.free_exchange_admin.rest.queries.SiteApprover;
-import com.technologies.mobile.free_exchange_admin.rest.queries.VkApprover;
-import com.vk.sdk.api.model.VKApiPost;
 
 public class EditOfferSiteActivity extends EditOfferVkActivity {
 
     public static final String OFFER_EXTRA = "OFFER_EXTRA";
+    private Offer mOffer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +21,14 @@ public class EditOfferSiteActivity extends EditOfferVkActivity {
     @Override
     protected void initEditText() {
         //super.initEditText();
-        Offer offer = getIntent().getParcelableExtra(OFFER_EXTRA);
-        mEtText.setText(offer.getText());
+        mOffer = getIntent().getParcelableExtra(OFFER_EXTRA);
+        mEtText.setText(mOffer.getText());
+    }
+
+    @Override
+    protected void initCategoriesSpinner() {
+        super.initCategoriesSpinner();
+        getCategoriesSpinner().setSelection(getCategoriesAdapter().getIndexById(mOffer.getCategory()));
     }
 
     @Override
@@ -39,7 +44,8 @@ public class EditOfferSiteActivity extends EditOfferVkActivity {
         switch (view.getId()){
             case R.id.bCheck:{
                 approver = new SiteApprover((Offer) getIntent().getParcelableExtra(OFFER_EXTRA),
-                        mEtText.getText().toString(),mRecyclerPostPhotosAdapter.getData());
+                        mEtText.getText().toString(),mRecyclerPostPhotosAdapter.getData(),
+                        ((Category) mSCategories.getSelectedItem()).getId());
                 approver.setApproverCallback(this);
                 approver.approveRequest(mIsChanged);
                 break;

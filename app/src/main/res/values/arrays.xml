@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="categoriesIds">
+        <!--<item>@integer/all</item>-->
+        <item>@integer/without_category</item>
+        <item>@integer/closes</item>
+        <item>@integer/shoes</item>
+        <item>@integer/for_children</item>
+        <item>@integer/all_for_beauty</item>
+        <item>@integer/technique</item>
+        <item>@integer/all_for_home</item>
+        <item>@integer/books</item>
+        <item>@integer/auto_and_moto</item>
+        <item>@integer/others</item>
+        <item>@integer/services</item>
+    </array>
+
+    <array name="categoriesNames">
+        <!--<item>@string/all</item>-->
+        <item>@string/without_category</item>
+        <item>@string/closes</item>
+        <item>@string/shoes</item>
+        <item>@string/for_children</item>
+        <item>@string/all_for_beauty</item>
+        <item>@string/technique</item>
+        <item>@string/all_for_home</item>
+        <item>@string/books</item>
+        <item>@string/auto_and_moto</item>
+        <item>@string/others</item>
+        <item>@string/services</item>
+    </array>
+
+</resources>

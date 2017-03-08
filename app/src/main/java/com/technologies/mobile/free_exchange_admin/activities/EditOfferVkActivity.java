@@ -21,14 +21,18 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.technologies.mobile.free_exchange_admin.R;
+import com.technologies.mobile.free_exchange_admin.adapters.CategorySpinnerAdapter;
 import com.technologies.mobile.free_exchange_admin.adapters.RecyclerPostPhotosAdapter;
 import com.technologies.mobile.free_exchange_admin.callbacks.ApproverCallback;
 import com.technologies.mobile.free_exchange_admin.callbacks.MyRecyclerItemTouchCallback;
 import com.technologies.mobile.free_exchange_admin.callbacks.OnListItemsChangeListener;
+import com.technologies.mobile.free_exchange_admin.model.CategoriesManager;
+import com.technologies.mobile.free_exchange_admin.model.Category;
 import com.technologies.mobile.free_exchange_admin.rest.model.Check;
 import com.technologies.mobile.free_exchange_admin.rest.queries.Approver;
 import com.technologies.mobile.free_exchange_admin.rest.queries.VkApprover;
@@ -70,6 +74,9 @@ public class EditOfferVkActivity extends AppCompatActivity implements CompoundBu
     Button mBCheck;
     EditText mEtText;
 
+    Spinner mSCategories;
+    CategorySpinnerAdapter mCsAdapter;
+
     RecyclerPostPhotosAdapter mRecyclerPostPhotosAdapter;
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
@@ -106,6 +113,7 @@ public class EditOfferVkActivity extends AppCompatActivity implements CompoundBu
 
         mEtText = (EditText) findViewById(R.id.etText);
         initEditText();
+        initCategoriesSpinner();
         mEtText.addTextChangedListener(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rvPhotos);
@@ -125,6 +133,13 @@ public class EditOfferVkActivity extends AppCompatActivity implements CompoundBu
     protected void initEditText(){
         VKApiPost mVkApiPost = getIntent().getParcelableExtra(VK_POST_EXTRA);
         mEtText.setText(mVkApiPost.text);
+    }
+
+    protected void initCategoriesSpinner(){
+        mSCategories = (Spinner) findViewById(R.id.sCategories);
+        mCsAdapter = new CategorySpinnerAdapter(this,R.layout.spinner_item);
+        mCsAdapter.initSpinner();
+        mSCategories.setAdapter(mCsAdapter);
     }
 
     protected void initAdapter(){
@@ -191,9 +206,10 @@ public class EditOfferVkActivity extends AppCompatActivity implements CompoundBu
         switch (view.getId()){
             case R.id.bCheck:{
                 approver = new VkApprover((VKApiPost)getIntent().getParcelableExtra(VK_POST_EXTRA),
-                        mEtText.getText().toString(),mRecyclerPostPhotosAdapter.getData());
+                        mEtText.getText().toString(),mRecyclerPostPhotosAdapter.getData(),
+                        ((Category) mSCategories.getSelectedItem()).getId());
                 approver.setApproverCallback(this);
-                approver.approveRequest(mIsChanged);
+                approver.approveRequest(true);
                 break;
             }
         }
@@ -238,5 +254,13 @@ public class EditOfferVkActivity extends AppCompatActivity implements CompoundBu
             }
         });
         builder.create().show();
+    }
+
+    public Spinner getCategoriesSpinner() {
+        return mSCategories;
+    }
+
+    public CategorySpinnerAdapter getCategoriesAdapter() {
+        return mCsAdapter;
     }
 }
